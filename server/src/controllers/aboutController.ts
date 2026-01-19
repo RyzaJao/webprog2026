@@ -1,5 +1,12 @@
 import type { RequestHandler } from "express"
+import { logger } from "../middlewares/logger.ts"
 
 export const getAbout:RequestHandler = (req, res) => {
     res.send('This is the about page...')
+}
+
+export const getError:RequestHandler = (req, res) => {
+    //throw new Error("Sorry may error po")
+    logger.error("Sorry may error po")
+    res.status(500).send('Internal Server Error')
 }
