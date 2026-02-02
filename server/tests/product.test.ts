@@ -1,8 +1,11 @@
 import supertest from "supertest";
-import { afterAll, beforeAll, beforeEach, describe, it, jest } from "@jest/globals";
+import { afterAll, beforeAll, beforeEach, describe, expect, it, jest } from "@jest/globals";
 import { app } from "../src/server.ts";
-import { connectToDatabase, disconnectFromDatabase, clearCollections } from "../src/db.ts";
-
+import {
+  connectToDatabase,
+  disconnectFromDatabase,
+  clearCollections,
+} from "../src/db.ts";
 
 // silence console.log and console.error
 jest.spyOn(console, "log").mockImplementation(() => {});
@@ -34,7 +37,59 @@ describe("Product API PUT", () => {
     await supertest(app)
       .post(`/api/products`)
       .send(product)
-      .expect(200);
+      .expect(201);
+  });
+
+  it("should not create a duplicate product", async () => {
+    const product = {
+      name: "Test Product",
+      description: "Test description",
+      price: 100,
+      qty: 5
+    };
+
+    await supertest(app)
+      .post(`/api/products`)
+      .send(product)
+      .expect(201);
+    await supertest(app)
+      .post(`/api/products`)
+      .send(product)
+      .expect(409);
+  });
+
+  it("should not create a product without name", async () => {
+    const product = {
+      description: "Test description",
+      price: 100,
+      qty: 5
+    };
+
+    await supertest(app)
+      .post(`/api/products`)
+      .send(product)
+      .expect(422);
+  });
+
+  it("should update the product", async () => {
+    const product = {
+      name: "Test Product",
+      description: "Test description",
+      price: 1,
+      qty: 1
+    };
+
+    let result = await supertest(app)
+      .post(`/api/products`)
+      .send(product)
+    expect(result.status).toBe(201)
+
+    product.name = 'New Product'
+    result = await supertest(app)
+      .put(`/api/products/${result.body._id}`)
+      .send(product)
+    expect(result.status).toBe(200)
+    expect(result.body.name).toBe('New Product')
   });
 
   it("should return 404 if product is invalid/not found", async () => {
@@ -49,5 +104,25 @@ describe("Product API PUT", () => {
       .put(`/api/products/${productId}`)
       .send(product)
       .expect(404);
+  });
+
+it("should delete the product", async () => {
+    const product = {
+      name: "Test Product",
+      description: "Test description",
+      price: 1,
+      qty: 1
+    };
+
+    let result = await supertest(app)
+      .post(`/api/products`)
+      .send(product)
+    expect(result.status).toBe(201)
+
+    result = await supertest(app)
+      .delete(`/api/products/${result.body._id}`)
+      .send(product)
+    expect(result.status).toBe(200)
+    expect(result.body.name).toBe('Test Product')
   });
 });
