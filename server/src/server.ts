@@ -5,6 +5,8 @@ import productRoutes from "./routes/productRoutes.ts";
 import { logger } from "./middlewares/logger.ts";
 import mongoose from "mongoose";
 import { connectToDatabase, disconnectFromDatabase } from "./db.ts";
+import postRoutes from "./routes/postRoutes.ts";
+import orderRoutes from "./routes/orderRoutes.ts";
 
 process.loadEnvFile()
 
@@ -30,6 +32,8 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 app.use('/about', aboutRoutes)
 app.use('/api/users', userRoutes)
 app.use('/api/products', productRoutes)
+app.use('/api/posts', postRoutes)
+app.use('/api/orders', orderRoutes)
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello World with TypeScript and Express!!!");

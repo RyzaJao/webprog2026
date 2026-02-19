@@ -1,6 +1,5 @@
 import type { RequestHandler } from "express"
-import Product from "../models/products.ts"
-
+import Product from "../models/product.ts";
 
 export const getProducts: RequestHandler = async (req, res) => {
     let params: any = {}

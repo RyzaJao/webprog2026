@@ -126,3 +126,4 @@ it("should delete the product", async () => {
     expect(result.body.name).toBe('Test Product')
   });
 });
+
